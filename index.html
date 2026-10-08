@@ -2825,6 +2825,127 @@
         });
       })();
 
+      /* ─── Google Analytics event tracking ─── */
+      (function () {
+        const track = (name, params) => {
+          if (typeof gtag === "function") gtag("event", name, params || {});
+        };
+
+        // Location of an element on the page = nearest section/nav/footer
+        const locationOf = (el) => {
+          const host = el.closest("nav, header, footer, section[id], section");
+          if (!host) return "page";
+          if (host.id) return host.id;
+          return host.className.split(" ")[0] || host.tagName.toLowerCase();
+        };
+
+        // Clicks (delegated): CTAs, sign-in, nav, mailto, outbound, buttons
+        document.addEventListener("click", (ev) => {
+          const el = ev.target.closest("a, button");
+          if (!el) return;
+          const text = (el.textContent || "").replace(/\s+/g, " ").trim();
+          const where = locationOf(el);
+
+          if (el.tagName === "BUTTON") {
+            track("button_click", {
+              button_text: text,
+              section: where,
+            });
+            return;
+          }
+
+          const href = el.getAttribute("href") || "";
+          if (href.startsWith("mailto:")) {
+            track("contact_click", { link_url: href, section: where });
+          } else if (href.startsWith("#")) {
+            if (href.length > 1)
+              track("nav_click", {
+                link_text: text,
+                link_url: href,
+                section: where,
+              });
+          } else if (/app\.colosal\.xyz\/?$/.test(href)) {
+            track("sign_in_click", { link_text: text, section: where });
+          } else if (/signup|colosal-beta-access/.test(href)) {
+            track("cta_click", {
+              link_text: text,
+              link_url: href,
+              section: where,
+            });
+          } else if (el.hostname && el.hostname !== location.hostname) {
+            track("click", {
+              link_text: text,
+              link_url: href,
+              link_domain: el.hostname,
+              outbound: true,
+              section: where,
+            });
+          }
+        });
+
+        // Section views: fire once per section when 40% visible
+        const seen = new Set();
+        const sectionObs = new IntersectionObserver(
+          (entries) =>
+            entries.forEach((e) => {
+              const id = e.target.id;
+              if (e.isIntersecting && !seen.has(id)) {
+                seen.add(id);
+                track("section_view", { section: id });
+              }
+            }),
+          { threshold: 0.4 },
+        );
+        document
+          .querySelectorAll("section[id]")
+          .forEach((s) => sectionObs.observe(s));
+
+        // Scroll depth: 25 / 50 / 75 / 90 %
+        const marks = [25, 50, 75, 90];
+        const hit = new Set();
+        let ticking = false;
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+              ticking = false;
+              const doc = document.documentElement;
+              const max = doc.scrollHeight - window.innerHeight;
+              if (max <= 0) return;
+              const pct = (window.scrollY / max) * 100;
+              marks.forEach((m) => {
+                if (pct >= m && !hit.has(m)) {
+                  hit.add(m);
+                  track("scroll_depth", { percent_scrolled: m });
+                }
+              });
+            });
+          },
+          { passive: true },
+        );
+
+        // Engaged time: 30s / 60s / 120s of visible time
+        let visibleMs = 0;
+        let last = document.visibilityState === "visible" ? Date.now() : null;
+        const timeMarks = [30, 60, 120];
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "hidden") {
+            if (last) visibleMs += Date.now() - last;
+            last = null;
+          } else {
+            last = Date.now();
+          }
+        });
+        setInterval(() => {
+          if (!last) return;
+          const total = (visibleMs + Date.now() - last) / 1000;
+          while (timeMarks.length && total >= timeMarks[0])
+            track("engaged_time", { seconds: timeMarks.shift() });
+        }, 5000);
+      })();
+
       /* ─── Hero: feed div kept in DOM — orbs handle the motion ─── */
 
       /* ─── Score panel: arc fill + count-up + bar animations ─── */

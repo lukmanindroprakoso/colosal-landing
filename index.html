@@ -393,6 +393,13 @@
         gap: 14px;
       }
 
+      .hero-btns {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+      }
+
       .hero-note {
         font-size: 14px;
         color: var(--text4);
@@ -2045,22 +2052,45 @@
           review and send.
         </p>
         <div class="hero-cta reveal in">
-          <a
-            class="btn btn-primary btn-lg"
-            href="https://colosal-beta-access.lovable.app"
-            target="_blank"
-            rel="noopener"
-          >
-            Try it Free →
-          </a>
-          <a
-            class="btn btn-outline"
-            href="https://chromewebstore.google.com/detail/colosal/ajmlmlicbggmgeeinnfdfcbokljomocc?hl=en&authuser=0"
-            target="_blank"
-            rel="noopener"
-          >
-            Get the Chrome Extension
-          </a>
+          <div class="hero-btns">
+            <a
+              class="btn btn-primary btn-lg"
+              href="https://colosal-beta-access.lovable.app"
+              target="_blank"
+              rel="noopener"
+            >
+              Try it Free →
+            </a>
+            <a
+              class="btn btn-outline btn-lg"
+              href="https://chromewebstore.google.com/detail/colosal/ajmlmlicbggmgeeinnfdfcbokljomocc?hl=en&authuser=0"
+              target="_blank"
+              rel="noopener"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 48 48"
+                aria-hidden="true"
+              >
+                <path
+                  fill="#EA4335"
+                  d="M24 4a20 20 0 0 1 17.32 10H24a10 10 0 0 0-8.66 5L7.4 10.2A20 20 0 0 1 24 4z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M6.68 36A20 20 0 0 1 7.4 10.2l7.94 8.8a10 10 0 0 0 .02 10.02L24 44A20 20 0 0 1 6.68 36z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M41.32 36A20 20 0 0 1 24 44l8.66-15a10 10 0 0 0 0-10h8.66a20 20 0 0 1 0 17z"
+                />
+                <circle cx="24" cy="24" r="8" fill="#fff" />
+                <circle cx="24" cy="24" r="6.2" fill="#4285F4" />
+              </svg>
+              Get the Chrome Extension
+            </a>
+          </div>
           <div class="hero-note">
             <span>No credit card required</span
             ><span class="sep">&nbsp;·&nbsp;</span
